@@ -1,0 +1,53 @@
+import json
+import requests
+import time
+import sqlite3
+import os.path
+import argparse
+
+timeBetweenRequests = 300
+
+#Gets the command line args
+parser = argparse.ArgumentParser(description='Retrieve data from TomTom on a road every 5 minutes')
+parser.add_argument('segmentId', help='The ID of the segment of road')
+parser.add_argument('location', help='The location longitude, lattitude to record data on')
+parser.add_argument('apiKey', help="A TomTom API key")
+parser.add_argument('-v', '--verbose', action='store_true', help='Output collected data to terminal')
+
+args = parser.parse_args()
+if args.verbose:
+    print("This will be verbose")
+
+
+
+#prepares the database
+con = sqlite3.connect('data.db')
+cur = con.cursor()
+
+#if the db does not exist, create it
+cur.execute('SELECT count(name) FROM sqlite_master WHERE type=\'table\' and name =\'traffic_data\'')
+if cur.fetchone()[0] ==0:
+    print("Data table not found, creating it...")
+    cur.execute('CREATE TABLE traffic_data (roadID TEXT, current_speed INT, \
+        free_flow_speed INT, current_travel_time INT, free_flow_travel_time INT, confidence FLOAT)')
+
+
+
+while(True):
+    if args.verbose: print("Making a request")
+    #make the request
+    r = requests.get('https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json?key='+args.apiKey+'&point='+args.location)
+    jsondata = r.json()
+    #print the data to console
+    if args.verbose: print(("Id: ", str(args.segmentId), "Current Speed: ", int(jsondata['flowSegmentData']['currentSpeed']), "Free Flow Speed",
+        int(jsondata['flowSegmentData']['freeFlowSpeed']), "Current Travel Time: ",int(jsondata['flowSegmentData']['currentTravelTime']), 
+        "Free Flow Travel Time: ",int(jsondata['flowSegmentData']['freeFlowTravelTime']),"Confidence: ",
+        float(jsondata['flowSegmentData']['confidence'])))
+    #insert the data into the database table
+    cur.execute('INSERT INTO traffic_data values (?, ?, ?, ?, ?, ?)', (str(args.segmentId), int(jsondata['flowSegmentData']['currentSpeed']), 
+        int(jsondata['flowSegmentData']['freeFlowSpeed']), int(jsondata['flowSegmentData']['currentTravelTime']), 
+        int(jsondata['flowSegmentData']['freeFlowTravelTime']), float(jsondata['flowSegmentData']['confidence'])))
+        #commit the changes
+    con.commit()
+    #wait for x seconds
+    time.sleep(timeBetweenRequests)
