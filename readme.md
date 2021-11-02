@@ -1,9 +1,9 @@
-#Traffic Data Collector
+# Traffic Data Collector
 The purpose of this tool is to collect data on a specific road segment every 5 minutes.
 The data will be collected and stored in an SQLite3 database called data.db
 
 
-##Usage
+## Usage
 ```
 Retrieve data from TomTom on a road every 5 minutes
 
@@ -19,7 +19,7 @@ optional arguments:
 
 
 
-##Reference 
+## Reference 
 - TomTom API documentation 
 https://developer.tomtom.com/traffic-api/traffic-api-documentation
 - Python docs sqlite3 https://docs.python.org/3/library/sqlite3.html
