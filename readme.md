@@ -1,9 +1,9 @@
-#Traffic Data Collector
+# Traffic Data Collector
 The purpose of this tool is to collect data on a road segments every 5 minutes.
 The data will be collected and stored in an SQLite3 database called data.db
 
 
-##Usage
+## Usage
 The `segements.csv` file contains id, co-ordinate pairs of locations to be tested, the co-ordinates are in the form `longitude,latitude`.
 
 
@@ -23,7 +23,7 @@ optional arguments:
 
 
 
-##Reference 
+## Reference 
 - TomTom API documentation 
 https://developer.tomtom.com/traffic-api/traffic-api-documentation
 - Python docs sqlite3 https://docs.python.org/3/library/sqlite3.html
