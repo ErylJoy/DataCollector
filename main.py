@@ -5,6 +5,7 @@ import sqlite3
 import os.path
 import argparse
 import csv
+from datetime import datetime
 
 timeBetweenRequests = 300
 
@@ -21,15 +22,15 @@ if args.verbose:
     print("This will be verbose")
 
 #prepares the database
-con = sqlite3.connect('data.db')
-cur = con.cursor()
+# con = sqlite3.connect('data.db')
+# cur = con.cursor()
 
-#if the db does not exist, create it
-cur.execute('SELECT count(name) FROM sqlite_master WHERE type=\'table\' and name =\'traffic_data\'')
-if cur.fetchone()[0] ==0:
-    print("Data table not found, creating it...")
-    cur.execute('CREATE TABLE traffic_data (roadID TEXT, current_speed INT, \
-        free_flow_speed INT, current_travel_time INT, free_flow_travel_time INT, confidence FLOAT)')
+# #if the db does not exist, create it
+# cur.execute('SELECT count(name) FROM sqlite_master WHERE type=\'table\' and name =\'traffic_data\'')
+# if cur.fetchone()[0] ==0:
+#     print("Data table not found, creating it...")
+#     cur.execute('CREATE TABLE traffic_data (roadID TEXT, current_speed INT, \
+#         free_flow_speed INT, current_travel_time INT, free_flow_travel_time INT, confidence FLOAT)')
 
 
 
@@ -47,11 +48,18 @@ while(True):
                 int(jsondata['flowSegmentData']['freeFlowSpeed']), "Current Travel Time: ",int(jsondata['flowSegmentData']['currentTravelTime']), 
                 "Free Flow Travel Time: ",int(jsondata['flowSegmentData']['freeFlowTravelTime']),"Confidence: ",
                 float(jsondata['flowSegmentData']['confidence'])))
-            #insert the data into the database table
-            cur.execute('INSERT INTO traffic_data values (?, ?, ?, ?, ?, ?)', (str(row[0]), int(jsondata['flowSegmentData']['currentSpeed']), 
-                int(jsondata['flowSegmentData']['freeFlowSpeed']), int(jsondata['flowSegmentData']['currentTravelTime']), 
-                int(jsondata['flowSegmentData']['freeFlowTravelTime']), float(jsondata['flowSegmentData']['confidence'])))
-                #commit the changes
-            con.commit()
-            #wait for x seconds
+            with open('./CSVs/'+str(row[0])+'.csv', mode='a') as data:
+                writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                writer.writerow([str(datetime.now().strftime("%Y/%m/%d %H:%M:%S")), float(jsondata['flowSegmentData']['currentSpeed'])])
         time.sleep(timeBetweenRequests)
+
+
+            #insert the data into the database table
+            # cur.execute('INSERT INTO traffic_data values (?, ?, ?, ?, ?, ?)', (str(row[0]), int(jsondata['flowSegmentData']['currentSpeed']), 
+            #     int(jsondata['flowSegmentData']['freeFlowSpeed']), int(jsondata['flowSegmentData']['currentTravelTime']), 
+            #     int(jsondata['flowSegmentData']['freeFlowTravelTime']), float(jsondata['flowSegmentData']['confidence'])))
+            #     #commit the changes
+            # con.commit()
+            #wait for x seconds
+
+    
