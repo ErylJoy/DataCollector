@@ -1,13 +1,12 @@
 import json
 import requests
 import time
-import sqlite3
 import os.path
 import argparse
 import csv
 from datetime import datetime
 
-timeBetweenRequests = 300
+timeBetweenRequests = 900
 
 #Gets the command line args
 parser = argparse.ArgumentParser(description='Retrieve data from TomTom on a road every 5 minutes')
@@ -38,7 +37,7 @@ while(True):
                 float(jsondata['flowSegmentData']['confidence'])))
             with open('./CSVs/'+str(row[0])+'.csv', mode='a') as data:
                 writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                writer.writerow([str(datetime.now().strftime("%Y/%m/%d %H:%M:%S")), float(jsondata['flowSegmentData']['currentSpeed'])])
+                writer.writerow([str(datetime.now().strftime("%Y/%m/%d %H:%M:%S")), float(jsondata['flowSegmentData']['currentSpeed']), float(jsondata['flowSegmentData']['confidence'])])
         time.sleep(timeBetweenRequests)
 
     
