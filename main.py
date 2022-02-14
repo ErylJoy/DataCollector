@@ -10,8 +10,6 @@ timeBetweenRequests = 900
 
 #Gets the command line args
 parser = argparse.ArgumentParser(description='Retrieve data from TomTom on a road every 5 minutes')
-# parser.add_argument('segmentId', help='The ID of the segment of road')
-# parser.add_argument('location', help='The location longitude, lattitude to record data on')
 parser.add_argument('csvFile', help='The file to load segments data from')
 parser.add_argument('apiKey', help="A TomTom API key")
 parser.add_argument('-v', '--verbose', action='store_true', help='Output collected data to terminal')
